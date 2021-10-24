@@ -5,9 +5,18 @@ import database
 from auth.auth_handler import sign_jwt, decode_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Union, Optional
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 API_KEY = 'super_secret_key'
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 async def check_user(data: UserLogin) -> dict:
