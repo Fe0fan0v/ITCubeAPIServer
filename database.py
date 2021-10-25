@@ -1,8 +1,8 @@
 import motor.motor_asyncio
 from bson.objectid import ObjectId
+from mongo_login import dbpassword, dblogin
 
-
-MONGO_DB = 'mongodb://localhost:27017'
+MONGO_DB = f'mongodb+srv://{dblogin}:{dbpassword}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 database = client.itcube
 users = database.get_collection('users')
