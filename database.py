@@ -1,11 +1,11 @@
-# Модуль соедржит функции по работе с базой данных
+# Модуль содержит функции по работе с базой данных
 import motor.motor_asyncio
 from bson.objectid import ObjectId
-from mongo_login import dbpassword, dblogin
+from os import environ
 import asyncio
 
 
-MONGO_DB = f'mongodb+srv://{dblogin}:{dbpassword}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
+MONGO_DB = f'mongodb+srv://{environ["DB_LOGIN"]}:{environ["DB_PASSWORD"]}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 client.get_io_loop = asyncio.get_running_loop
 database = client.itcube
