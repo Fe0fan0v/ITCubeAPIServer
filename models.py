@@ -1,3 +1,4 @@
+# модуль содержит модели
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
@@ -5,6 +6,7 @@ import uuid
 
 
 class User(BaseModel):
+    # модель экземпляра пользователя
     public_id: str = Field(default=uuid.uuid4(), unique=True)
     name: Optional[str] = Field()
     surname: Optional[str] = Field()
@@ -18,6 +20,7 @@ class User(BaseModel):
 
 
 class UserLogin(BaseModel):
+    # модель запроса авторизации (при регистрации используется она же)
     email: EmailStr = Field(...)
     password: str = Field(...)
 
@@ -31,6 +34,7 @@ class UserLogin(BaseModel):
 
 
 class Profile(BaseModel):
+    # модель профиля пользователя
     id: str
     name: str = None
     surname: str = None
@@ -58,10 +62,12 @@ class Profile(BaseModel):
 
 
 class Message(BaseModel):
+    # модель сообщения
     message: str
 
 
 class Token(BaseModel):
+    # модель токена
     token: str
 
     class Config:

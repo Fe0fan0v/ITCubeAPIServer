@@ -8,8 +8,8 @@ from typing import Union, Optional
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-API_KEY = 'super_secret_key'
-origins = ["*"]
+API_KEY = 'super_secret_key'  # ключ для шифрования
+origins = ["*"]   # настройка CORS. В данном случае разрешены любые запросы
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -20,6 +20,7 @@ app.add_middleware(
 
 
 async def check_user(data: UserLogin) -> dict:
+    # метод проверяет данные введенные пользователем при авторизации
     user = await database.find_user({'email': data.email})
     if not user:
         return {'error': 'Wrong email'}
@@ -30,6 +31,7 @@ async def check_user(data: UserLogin) -> dict:
 
 
 async def check_token(token: str) -> Optional:
+    # метод проверяет токен пользователя
     email = decode_jwt(token)['email']
     user = await database.find_user({'email': email})
     return user if user else False
@@ -37,6 +39,7 @@ async def check_token(token: str) -> Optional:
 
 @app.get("/")
 async def index():
+    # сообщение на главной
     return {"message": "Welcome to ITCube Server. To read documentation you should go to /docs path"}
 
 
@@ -47,6 +50,7 @@ async def index():
                               'application/json': {'example': {'error': 'User already exists'}}}}}
           )
 async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
+    # метод регистрации пользователя
     founded = await database.find_user({'email': user.email})
     if not founded:
         user.password = generate_password_hash(user.password)
@@ -67,6 +71,7 @@ async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
                               'application/json': {'example': {'error': 'Wrong password'}}}}}
           )
 async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
+    # метод авторизации пользователя
     response = await check_user(user)
     if 'email' in response.keys():
         return {'token': sign_jwt(response['email'])}
@@ -81,6 +86,7 @@ async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
                           'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}}}
          )
 async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> Union[Profile, JSONResponse]:
+    # метод возвращает информацию по профилю пользователя, валидация по токену
     response = await check_token(token)
     if type(response) == dict:
         del response['password']
