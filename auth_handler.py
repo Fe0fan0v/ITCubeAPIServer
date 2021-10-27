@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 import jwt
 from typing import Optional
+from os import getenv
 
-
-JWT_SECRET = 'secret'
-JWT_ALGORITHM = 'HS256'
+JWT_SECRET = getenv('JWT_SECRET')
+JWT_ALGORITHM = getenv('JWT_ALGORITHM')
 
 
 def sign_jwt(email: str) -> str:

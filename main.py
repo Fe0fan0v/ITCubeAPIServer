@@ -6,12 +6,12 @@ from auth_handler import sign_jwt, decode_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Union, Optional
 from fastapi.middleware.cors import CORSMiddleware
-from os import environ
+from os import getenv
 from verify_email import validate_user
 
 
 app = FastAPI()
-API_KEY = environ['API_KEY']  # ключ для шифрования находится в переменной окружения
+API_KEY = getenv('API_KEY')  # ключ для шифрования находится в переменной окружения
 origins = ["*"]   # настройка CORS. В данном случае разрешены любые запросы
 app.add_middleware(
     CORSMiddleware,

@@ -3,11 +3,12 @@ import pprint
 
 import motor.motor_asyncio
 from bson.objectid import ObjectId
-from os import environ
+from os import getenv
 import asyncio
 
-
-MONGO_DB = f'mongodb+srv://{environ["DB_LOGIN"]}:{environ["DB_PASSWORD"]}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
+DB_LOGIN = getenv('DB_LOGIN')
+DB_PASSWORD = getenv('DB_PASSWORD')
+MONGO_DB = f'mongodb+srv://{DB_LOGIN}:{DB_PASSWORD}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 client.get_io_loop = asyncio.get_running_loop
 database = client.itcube

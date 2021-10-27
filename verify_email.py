@@ -3,21 +3,23 @@ import asyncio
 from database import update_user, find_user
 from models import Message, ErrorMessage
 from typing import Union
-import os
+from os import getenv
 from itsdangerous import URLSafeSerializer
+
+API_KEY = getenv('API_KEY')
 
 
 def create_verification_link(email: str) -> str:
     # метод возвращает ссылку для верификации email
-    serializer = URLSafeSerializer(os.getenv("API_KEY"))
-    return f"http://itcubeserver.online/email-verify/?token={serializer.dumps(email, salt=os.getenv('API_KEY'))}"
+    serializer = URLSafeSerializer(API_KEY)
+    return f"http://itcubeserver.online/email-verify/?token={serializer.dumps(email, salt=API_KEY)}"
 
 
 async def validate_user(token: str) -> Union[Message, ErrorMessage]:
     # метод валидирует email пользователя
-    serializer = URLSafeSerializer(os.getenv("API_KEY"))
+    serializer = URLSafeSerializer(API_KEY)
     try:
-        email = serializer.loads(token, salt=os.getenv('API_KEY'))
+        email = serializer.loads(token, salt=API_KEY)
         user = await find_user({'email': email})
         if not user:
             return ErrorMessage(**{'error': 'User doesn\'t exist'})
