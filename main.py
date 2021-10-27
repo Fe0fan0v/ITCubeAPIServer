@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Header
-from models import User, UserLogin, Profile, Message, Token
+from models import User, UserLogin, Profile, Message, Token, ErrorMessage
 from fastapi.responses import JSONResponse
 import database
-from auth.auth_handler import sign_jwt, decode_jwt
+from auth_handler import sign_jwt, decode_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Union, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from os import environ
+from verify_email import validate_user
+
 
 app = FastAPI()
 API_KEY = environ['API_KEY']  # ключ для шифрования находится в переменной окружения
@@ -96,3 +98,8 @@ async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiO
     else:
         return JSONResponse(status_code=403,
                             content={'error': 'Token is incorrect'})
+
+
+@app.get('/email-verify/')
+async def verify_email(token: str) -> Union[Message, ErrorMessage]:
+    return await validate_user(token)

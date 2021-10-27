@@ -65,6 +65,25 @@ class Message(BaseModel):
     # модель сообщения
     message: str
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": 'User validated successfully',
+            }
+        }
+
+
+class ErrorMessage(BaseModel):
+    # модель сообщения об ошибке
+    error: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "error": 'error message',
+            }
+        }
+
 
 class Token(BaseModel):
     # модель токена

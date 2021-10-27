@@ -1,4 +1,6 @@
 # Модуль содержит функции по работе с базой данных
+import pprint
+
 import motor.motor_asyncio
 from bson.objectid import ObjectId
 from os import environ
@@ -9,7 +11,7 @@ MONGO_DB = f'mongodb+srv://{environ["DB_LOGIN"]}:{environ["DB_PASSWORD"]}@itcube
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 client.get_io_loop = asyncio.get_running_loop
 database = client.itcube
-users = database.get_collection('users')
+users = database['users']
 
 
 def user_helper(user) -> dict:
@@ -31,10 +33,10 @@ def user_helper(user) -> dict:
 
 async def find_users() -> list:
     # Метод возвращает список пользователей, найденных по запросу
-    founded = []
-    async for user in users.find():
-        founded.append(user_helper(user))
-    return founded
+    cursor = await users.find()
+    if cursor:
+        founded = list([user_helper(user) for user in cursor])
+        return founded
 
 
 async def add_user(user_data: dict) -> dict:
@@ -51,7 +53,7 @@ async def find_user(params: dict) -> dict:
         return user_helper(user)
 
 
-async def update_user(email: str, data: dict):
+async def update_user(email: str, data: dict) -> bool:
     # метод изменяет данные пользователя в базе данных
     if len(data) < 1:
         return False
