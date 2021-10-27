@@ -31,6 +31,3 @@ async def validate_user(token: str) -> Union[Message, ErrorMessage]:
             return ErrorMessage(**{'error': 'Validation failed'})
     except Exception as e:
         return ErrorMessage(**{'error': str(e)})
-
-
-print(create_verification_link('kolya@mail.ru'))
