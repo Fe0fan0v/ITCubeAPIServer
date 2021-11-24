@@ -68,7 +68,7 @@ async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
 @app.post('/auth',
           tags=['Authorization'],
           response_model=Token,
-          responses={402: {
+          responses={400: {
               'model': Message,
               'content': {
                               'application/json': {'example': {'error': 'Wrong password'}}}}}
@@ -78,14 +78,14 @@ async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
     response = await check_user(user)
     if 'email' in response.keys():
         return {'token': sign_jwt(response['email'])}
-    return JSONResponse(status_code=402,
+    return JSONResponse(status_code=400,
                         content=response)
 
 
 @app.get('/profile',
          tags=['Profile'],
          response_model=Profile,
-         responses={403: {'model': Message,
+         responses={401: {'model': Message,
                           'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}}}
          )
 async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> Union[Profile, JSONResponse]:
@@ -96,7 +96,7 @@ async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiO
         del response['public_id']
         return Profile(**response)
     else:
-        return JSONResponse(status_code=403,
+        return JSONResponse(status_code=401,
                             content={'error': 'Token is incorrect'})
 
 
