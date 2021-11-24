@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Union, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from os import getenv
-from verify_email import validate_user
+from verify_email import validate_user, send_email, create_verification_link
 
 
 app = FastAPI()
@@ -59,6 +59,7 @@ async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
         user.password = generate_password_hash(user.password)
         user = User(**user.dict())
         user = await database.add_user(user.dict())
+        send_email(user['email'], {'subject': 'Подтверждение почты', 'text': create_verification_link(user['email'])})
         return {'token': sign_jwt(user['email'])}
     else:
         return JSONResponse(status_code=409,
