@@ -82,10 +82,32 @@ async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
                         content=response)
 
 
+@app.get('/auth',
+         tags=['Authorization'],
+         response_model=Message,
+         responses={200: {
+             'model': Message,
+             'content': {'application/json': {'example': {'OK': 'Token is correct'}}}
+                         },
+                    401: {
+                        'model': ErrorMessage,
+                        'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}
+                    }})
+async def check_token_status(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> JSONResponse:
+    # метод отправляет ответ о текущем состоянии токена
+    response = await check_token(token)
+    if type(response) == dict:
+        return JSONResponse(status_code=200,
+                            content={'OK': 'Token is correct'})
+    else:
+        return JSONResponse(status_code=401,
+                            content={'error': 'Token is incorrect'})
+
+
 @app.get('/profile',
          tags=['Profile'],
          response_model=Profile,
-         responses={401: {'model': Message,
+         responses={401: {'model': ErrorMessage,
                           'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}}}
          )
 async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> Union[Profile, JSONResponse]:
@@ -100,6 +122,7 @@ async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiO
                             content={'error': 'Token is incorrect'})
 
 
-@app.get('/email-verify/')
+@app.get('/email-verify/',
+         tags=['Verification'])
 async def verify_email(token: str) -> Union[Message, ErrorMessage]:
     return await validate_user(token)
