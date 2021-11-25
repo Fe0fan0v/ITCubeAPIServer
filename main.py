@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Header
-from models import User, UserLogin, Profile, Message, Token, ErrorMessage
+from models import User, UserLogin, Profile, Message, Token, ErrorMessage, Course, Courses
 from fastapi.responses import JSONResponse
 import database
 from auth_handler import sign_jwt, decode_jwt
@@ -126,4 +126,13 @@ async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiO
 @app.get('/email-verify/',
          tags=['Verification'])
 async def verify_email(token: str) -> Union[Message, ErrorMessage]:
+    # метод верифицует email пользователя по ссылке
     return await validate_user(token)
+
+
+@app.get('/courses',
+         tags=['Courses'],
+         response_model=Courses)
+async def get_courses() -> Union[list, ErrorMessage]:
+    # метод возвращает список курсов
+    return await database.find_courses()

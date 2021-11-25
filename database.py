@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 from os import getenv
 import asyncio
 
+
 DB_LOGIN = getenv('DB_LOGIN')
 DB_PASSWORD = getenv('DB_PASSWORD')
 MONGO_DB = f'mongodb+srv://{DB_LOGIN}:{DB_PASSWORD}@itcube.jgcp4.mongodb.net/ITCube?retryWrites=true&w=majority'
@@ -13,6 +14,7 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 client.get_io_loop = asyncio.get_running_loop
 database = client.itcube
 users = database['users']
+courses = database['courses']
 
 
 def user_helper(user) -> dict:
@@ -29,6 +31,17 @@ def user_helper(user) -> dict:
         'validated': user['validated'],
         'birthday': user['birthday'],
         'registration_date': user['registration_date']
+    }
+
+
+def course_helper(course) -> dict:
+    # Метод являет собой модель записи курса в базе данных
+    return {
+        'course_name': course['course_name'],
+        'ages': course['ages'],
+        'direction': course['direction'],
+        'duration': course['duration'],
+        'image': course['image']
     }
 
 
@@ -74,3 +87,10 @@ async def delete_user(email: str):
     if user:
         await users.delete_one({"email": email})
         return True
+
+
+async def find_courses() -> list:
+    # Метод возвращает список курсов, найденных по запросу
+    cursor = await courses.find()
+    if cursor:
+        return list([course_helper(course) for course in cursor])

@@ -19,6 +19,26 @@ class User(BaseModel):
     registration_date: datetime = Field(default=datetime.now())
 
 
+class Course(BaseModel):
+    # модель эксземпляра курса
+    course_name: str = Field(...)
+    ages: str = Field(...)
+    direction: str = Field(...)
+    duration: str = Field(...)
+    image: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "course_name": 'Виртуальное в реальном',
+                "ages": "13-18",
+                "direction": "VR/AR",
+                "duration": "1",
+                "image": "https://storage.yandexcloud.net/itcubeserverimages/VRAR/virtifreal.jpg",
+            }
+        }
+
+
 class UserLogin(BaseModel):
     # модель запроса авторизации (при регистрации используется она же)
     email: EmailStr = Field(...)
@@ -93,5 +113,17 @@ class Token(BaseModel):
         schema_extra = {
             "example": {
                 "token": 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8',
+            }
+        }
+
+
+class Courses(BaseModel):
+    # модель списка курсов
+    courses: list
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "courses": [Course]
             }
         }
