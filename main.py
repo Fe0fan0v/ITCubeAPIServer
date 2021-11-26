@@ -8,6 +8,7 @@ from typing import Union, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from os import getenv
 from verify_email import validate_user, send_email, create_verification_link
+from storage import upload, get_file_url
 
 
 app = FastAPI()

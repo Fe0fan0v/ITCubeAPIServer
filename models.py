@@ -17,6 +17,7 @@ class User(BaseModel):
     validated: bool = Field(default=False)
     birthday: Optional[datetime] = Field()
     registration_date: datetime = Field(default=datetime.now())
+    avatar: str = Field(...)
 
 
 class Course(BaseModel):
@@ -25,16 +26,32 @@ class Course(BaseModel):
     ages: str = Field(...)
     direction: str = Field(...)
     duration: str = Field(...)
-    image: str = Field(...)
+    groups: list = Field(default=[])
 
     class Config:
         schema_extra = {
             "example": {
-                "course_name": 'Виртуальное в реальном',
-                "ages": "13-18",
+                "course_name": 'Разработка VR/AR приложений',
+                "ages": "12+",
                 "direction": "VR/AR",
                 "duration": "1",
-                "image": "https://storage.yandexcloud.net/itcubeserverimages/VRAR/virtifreal.jpg",
+                "groups": ['Вообрази, научись, воплоти', 'Виртуальное в реальном']
+            }
+        }
+
+
+class Group(BaseModel):
+    # модель экземпляра группы
+    group_name: str = Field(...)
+    schedule: str = Field(...)
+    students: list = Field(default=[])
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "group_name": 'Разработка VR/AR приложений(Базовый уровень)',
+                "schedule": "ПН: 9:00, ПТ: 9:00",
+                "students": ['Иванов', 'Петров', 'Сидоров']
             }
         }
 
@@ -60,10 +77,10 @@ class Profile(BaseModel):
     surname: str = None
     email: EmailStr
     role: str
-    courses: list = None
     validated: bool
     birthday: datetime = None
     registration_date: datetime
+    avatar: str
 
     class Config:
         schema_extra = {
@@ -73,10 +90,10 @@ class Profile(BaseModel):
                 "surname": "Doe",
                 "email": "jhon@gmail.com",
                 "role": "entrant",
-                "courses": ['VR', 'JavaScript'],
                 "validated": False,
                 "birthday": "2004-10-19",
-                "registration_date": "2021-10-19T08:58:03.277000"
+                "registration_date": "2021-10-19T08:58:03.277000",
+                "avatar": "https://storage.yandexcloud.net/itcubeimages/avatar.jpg"
             }
         }
 
