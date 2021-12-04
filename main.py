@@ -10,10 +10,9 @@ from os import getenv
 from verify_email import validate_user, send_email, create_verification_link
 from storage import upload, get_file_url
 
-
 app = FastAPI()
 API_KEY = getenv('API_KEY')  # ключ для шифрования находится в переменной окружения
-origins = ["*"]   # настройка CORS. В данном случае разрешены любые запросы
+origins = ["*"]  # настройка CORS. В данном случае разрешены любые запросы
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -51,7 +50,7 @@ async def index():
           tags=['Registration'],
           response_model=Token,
           responses={409: {'content': {
-                              'application/json': {'example': {'error': 'User already exists'}}}}}
+              'application/json': {'example': {'error': 'User already exists'}}}}}
           )
 async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
     # метод регистрации пользователя
@@ -73,7 +72,7 @@ async def create_user(user: UserLogin) -> Union[dict, JSONResponse]:
           responses={400: {
               'model': Message,
               'content': {
-                              'application/json': {'example': {'error': 'Wrong password'}}}}}
+                  'application/json': {'example': {'error': 'Wrong password'}}}}}
           )
 async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
     # метод авторизации пользователя
@@ -90,12 +89,13 @@ async def login_user(user: UserLogin) -> Union[dict, JSONResponse]:
          responses={200: {
              'model': Message,
              'content': {'application/json': {'example': {'OK': 'Token is correct'}}}
-                         },
-                    401: {
-                        'model': ErrorMessage,
-                        'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}
-                    }})
-async def check_token_status(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> JSONResponse:
+         },
+             401: {
+                 'model': ErrorMessage,
+                 'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}
+             }})
+async def check_token_status(*, token: str = Header(None, example={
+    'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> JSONResponse:
     # метод отправляет ответ о текущем состоянии токена
     response = await check_token(token)
     if type(response) == dict:
@@ -112,7 +112,9 @@ async def check_token_status(*, token: str = Header(None, example={'token': 'eyJ
          responses={401: {'model': ErrorMessage,
                           'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}}}
          )
-async def user_profile(*, token: str = Header(None, example={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> Union[Profile, JSONResponse]:
+async def user_profile(*, token: str = Header(None, example={
+    'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> \
+Union[Profile, JSONResponse]:
     # метод возвращает информацию по профилю пользователя, валидация по токену
     response = await check_token(token)
     if type(response) == dict:
@@ -134,9 +136,9 @@ async def verify_email(token: str) -> Union[Message, ErrorMessage]:
 @app.get('/courses',
          tags=['Courses'],
          response_model=Courses)
-async def get_courses() -> Union[list, ErrorMessage]:
+async def get_courses() -> Union[dict, ErrorMessage]:
     # метод возвращает список курсов
-    return await database.find_courses()
+    return {"courses": await database.find_courses()}
 
 
 @app.put('/register_course')

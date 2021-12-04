@@ -93,9 +93,9 @@ async def delete_user(email: str):
 
 async def find_courses() -> list:
     # Метод возвращает список курсов, найденных по запросу
-    cursor = await courses.find()
-    if cursor:
-        return list([course_helper(course) for course in cursor])
+    courses_list = await courses.find().to_list(length=20)
+    if courses_list:
+        return [course_helper(course) for course in courses_list]
 
 
 async def add_course(course_data: dict) -> dict:
@@ -110,3 +110,4 @@ async def find_course(params: dict) -> dict:
     course = await courses.find_one(params)
     if course:
         return course_helper(course)
+

@@ -1,7 +1,7 @@
 # модуль содержит модели
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 import uuid
 
 
@@ -22,6 +22,7 @@ class User(BaseModel):
 
 class Course(BaseModel):
     # модель эксземпляра курса
+    id: str
     course_name: str = Field(...)
     ages: str = Field(...)
     direction: str = Field(...)
@@ -136,11 +137,36 @@ class Token(BaseModel):
 
 class Courses(BaseModel):
     # модель списка курсов
-    courses: list
+    courses: List[Course]
 
     class Config:
         schema_extra = {
             "example": {
-                "courses": [Course]
+                "courses": [
+                    {
+                        "id": "61ab55e7f998d9868472a122",
+                        "course_name": "Разработка VR/AR приложений",
+                        "ages": "12+",
+                        "direction": "VR/AR",
+                        "duration": "1+",
+                        "teachers": []
+                    },
+                    {
+                        "id": "61ab8b47ec690045c1f8ceb1",
+                        "course_name": "3D-моделирование",
+                        "ages": "12+",
+                        "direction": "VR/AR",
+                        "duration": "1+",
+                        "teachers": []
+                    },
+                    {
+                        "id": "61ab8b47ec690045c1f8ceb2",
+                        "course_name": "Кибергигиена(BigData)",
+                        "ages": "10+",
+                        "direction": "Цифровая гигиена и Big Data",
+                        "duration": "1",
+                        "teachers": []
+                    }
+                ]
             }
         }
