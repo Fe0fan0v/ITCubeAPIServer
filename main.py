@@ -137,3 +137,17 @@ async def verify_email(token: str) -> Union[Message, ErrorMessage]:
 async def get_courses() -> Union[list, ErrorMessage]:
     # метод возвращает список курсов
     return await database.find_courses()
+
+
+@app.put('/register_course')
+async def create_course(course: Course) -> Union[dict, JSONResponse]:
+    # метод регистрации курса
+    founded = await database.find_course({'course_name': course.course_name})
+    print(founded)
+    if not founded:
+        course = Course(**course.dict())
+        course = await database.add_course(course.dict())
+        return {'course_registered': f'{course["course_name"]}'}
+    else:
+        return JSONResponse(status_code=409,
+                            content={'error': 'Course already exists'})

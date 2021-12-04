@@ -101,5 +101,12 @@ async def find_courses() -> list:
 async def add_course(course_data: dict) -> dict:
     # метод добавляет курс в базу данных и возвращает его данные если добавление прошло удачно
     course = await courses.insert_one(course_data)
-    new_course = await course.find_one({"_id": course.inserted_id})
+    new_course = await courses.find_one({"_id": course.inserted_id})
     return course_helper(new_course)
+
+
+async def find_course(params: dict) -> dict:
+    # метод ищет курс по запросу параметров
+    course = await courses.find_one(params)
+    if course:
+        return course_helper(course)
