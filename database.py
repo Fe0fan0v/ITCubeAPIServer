@@ -14,7 +14,7 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DB)
 client.get_io_loop = asyncio.get_running_loop
 database = client.itcube
 users = database['users']
-courses = database['courses.csv']
+courses = database['courses']
 
 
 def user_helper(user) -> dict:
@@ -27,7 +27,7 @@ def user_helper(user) -> dict:
         'email': user['email'],
         'password': user['password'],
         'role': user['role'],
-        'courses.csv': user['courses.csv'],
+        'groups': user['groups'],
         'validated': user['validated'],
         'birthday': user['birthday'],
         'registration_date': user['registration_date'],
@@ -43,7 +43,7 @@ def course_helper(course) -> dict:
         'ages': course['ages'],
         'direction': course['direction'],
         'duration': course['duration'],
-        'groups': course['groups'],
+        'teachers': course['teachers'],
     }
 
 
@@ -102,4 +102,4 @@ async def add_course(course_data: dict) -> dict:
     # метод добавляет курс в базу данных и возвращает его данные если добавление прошло удачно
     course = await courses.insert_one(course_data)
     new_course = await course.find_one({"_id": course.inserted_id})
-    return user_helper(new_course)
+    return course_helper(new_course)
