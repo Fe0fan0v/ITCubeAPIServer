@@ -18,6 +18,7 @@ class User(BaseModel):
     birthday: Optional[datetime] = Field()
     registration_date: datetime = Field(default=datetime.now())
     avatar: str = Field(...)
+    groups: list = Field(default=[])
 
 
 class Course(BaseModel):
@@ -26,7 +27,7 @@ class Course(BaseModel):
     ages: str = Field(...)
     direction: str = Field(...)
     duration: str = Field(...)
-    groups: list = Field(default=[])
+    teachers: list = Field(default=[])
 
     class Config:
         schema_extra = {
@@ -35,7 +36,7 @@ class Course(BaseModel):
                 "ages": "12+",
                 "direction": "VR/AR",
                 "duration": "1",
-                "groups": ['Вообрази, научись, воплоти', 'Виртуальное в реальном']
+                "teachers": ['Емельяненко М.А.', 'Уткин В.Л.']
             }
         }
 
