@@ -13,7 +13,6 @@ class User(BaseModel):
     email: EmailStr = Field(...)
     password: str = Field(...)
     role: str = Field(default='entrant')
-    courses: Optional[list] = Field()
     validated: bool = Field(default=False)
     birthday: Optional[datetime] = Field()
     registration_date: datetime = Field(default=datetime.now())
