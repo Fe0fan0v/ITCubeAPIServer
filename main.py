@@ -1,14 +1,14 @@
-from fastapi import FastAPI, Header
-from models import User, UserLogin, Profile, Message, Token, ErrorMessage, Course, Courses
+from fastapi import FastAPI, Header, File, UploadFile
+from models import User, UserLogin, Profile, Message, Token, ErrorMessage, Course, Courses, EditProfile
 from fastapi.responses import JSONResponse
 import database
 from auth_handler import sign_jwt, decode_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-from typing import Union, Optional
+from typing import Union, Optional, Dict
 from fastapi.middleware.cors import CORSMiddleware
 from os import getenv
 from verify_email import validate_user, send_email, create_verification_link
-from storage import upload, get_file_url
+import storage
 
 app = FastAPI()
 API_KEY = getenv('API_KEY')  # ключ для шифрования находится в переменной окружения
@@ -114,7 +114,7 @@ async def check_token_status(*, token: str = Header(None, example={
          )
 async def user_profile(*, token: str = Header(None, example={
     'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> \
-Union[Profile, JSONResponse]:
+        Union[Profile, JSONResponse]:
     # метод возвращает информацию по профилю пользователя, валидация по токену
     response = await check_token(token)
     if type(response) == dict:
@@ -153,3 +153,54 @@ async def create_course(course: Course) -> Union[dict, JSONResponse]:
     else:
         return JSONResponse(status_code=409,
                             content={'error': 'Course already exists'})
+
+
+@app.put('/load_avatar', tags=['Upload'])
+async def load_avatar(file: UploadFile = File(...), token: str = Header(None, example={
+    'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> \
+        Union[Message, JSONResponse]:
+    response = await check_token(token)
+    if type(response) == dict:
+        filename = f"{response['surname']}.jpg"
+        storage.upload(file, storage.IMAGE_BUCKET, filename)
+        return Message(**{"message": 'User validated successfully'})
+    else:
+        return JSONResponse(status_code=401,
+                            content={'error': 'Token is incorrect'})
+
+
+@app.post('/edit-profile',
+          tags=['Edit', 'Profile'],
+          response_model=EditProfile,
+          responses={401: {'model': ErrorMessage,
+                           'content': {'application/json': {'example': {'error': 'Token is incorrect'}}}},
+                     400: {'model': ErrorMessage,
+                           'content': {'application/json': {'example': {'error': 'Profile haven\'t that items'}}}},
+                     200: {'model': Message,
+                           'content': {'application/json': {'example': {'message': 'data updated successful'}}}},
+
+                     }
+          )
+# Функция изменяет данные в профиле по запросу, требуется token
+async def edit_profile(items_to_edit: dict, token: str = Header(None, example={
+    'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im1hcnlAbWFpbC5ydSIsImV4cGlyZXMiOiIwMi8xMS8yMDIxIDA0OjIwIn0.s-kv8W9X1qEko3Qyom0akP81hgt4DHF2Ex4p__3GBj8'})) -> \
+        Union[JSONResponse]:
+    response = await check_token(token)
+    if type(response) == dict:
+        del response['password']
+        del response['public_id']
+        profile = Profile(**response)
+        if set(items_to_edit.keys()).issubset(profile.dict().keys()):
+            try:
+                await database.update_user(profile.email, items_to_edit)
+                return JSONResponse(status_code=200,
+                                    content={'message': 'data updated successful'})
+            except Exception as e:
+                return JSONResponse(status_code=401,
+                                    content={'error': e})
+        else:
+            return JSONResponse(status_code=400,
+                                content={'error': 'Profile haven\'t that items'})
+    else:
+        return JSONResponse(status_code=401,
+                            content={'error': 'Token is incorrect'})

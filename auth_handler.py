@@ -20,7 +20,7 @@ def sign_jwt(email: str) -> str:
 
 def decode_jwt(token: str) -> Optional:
     # декодирование токена
-    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"verify_signature": False})
     if datetime.strptime(decoded_token['expires'], '%d/%m/%Y %H:%M') >= datetime.utcnow():
         return decoded_token
     else:

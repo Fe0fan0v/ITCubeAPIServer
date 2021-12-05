@@ -1,7 +1,7 @@
 # модуль содержит модели
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 import uuid
 
 
@@ -16,8 +16,28 @@ class User(BaseModel):
     validated: bool = Field(default=False)
     birthday: Optional[datetime] = Field()
     registration_date: datetime = Field(default=datetime.now())
-    avatar: str = Field(...)
-    groups: list = Field(default=[])
+    avatar: Optional[str] = Field()
+    groups: Optional[list] = Field(default=[])
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Иван",
+                "surname": "Иванов",
+                "email": "ivanov@mail.ru",
+                "password": "hashed_password",
+                "role": "student",
+                "validated": "true",
+                "birthday": "25.12.2002",
+                "registration_date": "25.12.2020",
+                "avatar": "storage.yandex.org/picture.jpg",
+                "groups": [{
+                    "group_name": 'Разработка VR/AR приложений(Базовый уровень)',
+                    "schedule": "ПН: 9:00, ПТ: 9:00",
+                    "students": ['Иванов', 'Петров', 'Сидоров']
+                }]
+            }
+        }
 
 
 class Course(BaseModel):
@@ -81,7 +101,8 @@ class Profile(BaseModel):
     validated: bool
     birthday: datetime = None
     registration_date: datetime
-    avatar: str
+    groups: Optional[list] = Field(default=[])
+    avatar: Optional[str] = Field()
 
     class Config:
         schema_extra = {
@@ -94,6 +115,11 @@ class Profile(BaseModel):
                 "validated": False,
                 "birthday": "2004-10-19",
                 "registration_date": "2021-10-19T08:58:03.277000",
+                "groups": [{
+                    "group_name": 'Разработка VR/AR приложений(Базовый уровень)',
+                    "schedule": "ПН: 9:00, ПТ: 9:00",
+                    "students": ['Иванов', 'Петров', 'Сидоров']
+                }],
                 "avatar": "https://storage.yandexcloud.net/itcubeimages/avatar.jpg"
             }
         }
@@ -168,5 +194,17 @@ class Courses(BaseModel):
                         "teachers": []
                     }
                 ]
+            }
+        }
+
+
+class EditProfile(BaseModel):
+    Dict
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Иван",
+                "surname": "Иванов",
             }
         }
